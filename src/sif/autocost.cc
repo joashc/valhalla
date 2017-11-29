@@ -29,6 +29,10 @@ constexpr float kDefaultGateCost                = 30.0f;  // Seconds
 constexpr float kDefaultGatePenalty             = 300.0f; // Seconds
 constexpr float kDefaultTollBoothCost           = 15.0f;  // Seconds
 constexpr float kDefaultTollBoothPenalty        = 0.0f;   // Seconds
+constexpr float kDefaultRestaurantCost          = 0.0f;  // Seconds
+constexpr float kDefaultTollBoothPenalty        = 0.0f;   // Seconds
+constexpr float kDefaultSchoolCost              = 0.0f;  // Seconds
+constexpr float kDefaultTollBoothPenalty        = 0.0f;   // Seconds
 constexpr float kDefaultFerryCost               = 300.0f; // Seconds
 constexpr float kDefaultCountryCrossingCost     = 600.0f; // Seconds
 constexpr float kDefaultCountryCrossingPenalty  = 0.0f;   // Seconds
@@ -75,6 +79,10 @@ constexpr ranged_default_t<float> kGateCostRange{0, kDefaultGateCost, kMaxSecond
 constexpr ranged_default_t<float> kGatePenaltyRange{0, kDefaultGatePenalty, kMaxSeconds};
 constexpr ranged_default_t<float> kTollBoothCostRange{0, kDefaultTollBoothCost, kMaxSeconds};
 constexpr ranged_default_t<float> kTollBoothPenaltyRange{0, kDefaultTollBoothPenalty, kMaxSeconds};
+constexpr ranged_default_t<float> kRestaurantCostRange{0, kDefaultRestaurantCost, kMaxSeconds};
+constexpr ranged_default_t<float> kRestaurantPenaltyRange{0, kDefaultRestaurantPenalty, kMaxSeconds};
+constexpr ranged_default_t<float> kSchoolCostRange{0, kDefaultSchoolCost, kMaxSeconds};
+constexpr ranged_default_t<float> kSchoolPenaltyRange{0, kDefaultSchoolPenalty, kMaxSeconds};
 constexpr ranged_default_t<float> kFerryCostRange{0, kDefaultFerryCost, kMaxSeconds};
 constexpr ranged_default_t<float> kCountryCrossingCostRange{0, kDefaultCountryCrossingCost, kMaxSeconds};
 constexpr ranged_default_t<float> kCountryCrossingPenaltyRange{0, kDefaultCountryCrossingPenalty, kMaxSeconds};
@@ -262,6 +270,10 @@ class AutoCost : public DynamicCost {
   float gate_penalty_;              // Penalty (seconds) to go through gate
   float tollbooth_cost_;            // Cost (seconds) to go through toll booth
   float tollbooth_penalty_;         // Penalty (seconds) to go through a toll booth
+  float restaurant_cost_;           // Cost (seconds) to go through restaurant
+  float restaurant_penalty_;        // Penalty (seconds) to go through a restaurant
+  float school_cost_;               // Cost (seconds) to go through school
+  float school_penalty_;            // Penalty (seconds) to go through a school
   float ferry_cost_;                // Cost (seconds) to enter a ferry
   float ferry_penalty_;             // Penalty (seconds) to enter a ferry
   float ferry_factor_;              // Weighting to apply to ferry edges
@@ -310,7 +322,22 @@ AutoCost::AutoCost(const boost::property_tree::ptree& pt)
   tollbooth_cost_ = kTollBoothCostRange(
     pt.get<float>("toll_booth_cost", kDefaultTollBoothCost)
   );
+  restaurant_cost_ = kRestaurantCostRange(
+    pt.get<float>("restaurant_cost", kDefaultRestaurantCost)
+  );
+  restaurant_cost_ = kRestaurantPenaltyRange(
+    pt.get<float>("restaurant_penalty", kDefaultRestaurantPenalty)
+  );
+  school_cost_ = kSchoolCostRange(
+    pt.get<float>("school_cost", kDefaultSchoolCost)
+  );
+  school_cost_ = kSchoolPenaltyRange(
+    pt.get<float>("school_penalty", kDefaultSchoolPenalty)
+  );
   tollbooth_penalty_ = kTollBoothPenaltyRange(
+    pt.get<float>("toll_booth_penalty", kDefaultTollBoothPenalty)
+  );
+  restaurant_penalty_ = kTollBoothPenaltyRange(
     pt.get<float>("toll_booth_penalty", kDefaultTollBoothPenalty)
   );
   alley_penalty_ = kAlleyPenaltyRange(
@@ -454,6 +481,14 @@ Cost AutoCost::TransitionCost(const baldr::DirectedEdge* edge,
      (!pred.toll() && edge->toll())) {
     seconds += tollbooth_cost_;
     penalty += tollbooth_penalty_;
+  }
+  if (node->type() == NodeType::kRestaurant) {
+    seconds += restaurant_cost_;
+    penalty += restaurant_penalty_;
+  }
+  if (node->type() == NodeType::kSchool) {
+    seconds += school_cost_;
+    penalty += school_penalty_;
   }
 
   // Additional penalties without any time cost
@@ -1078,6 +1113,46 @@ void testAutoCostParams() {
     if (ctorTester->tollbooth_cost_ < kTollBoothCostRange.min ||
         ctorTester->tollbooth_cost_ > kTollBoothCostRange.max) {
       throw std::runtime_error ("tollbooth_cost_ is not within it's range");
+    }
+  }
+
+  // restaurant_cost_
+  distributor.reset(make_distributor_from_range(kRestaurantCostRange));
+  for (unsigned i = 0; i < testIterations; ++i) {
+    ctorTester.reset(make_autocost_from_json("restaurant_cost", (*distributor)(generator)));
+    if (ctorTester->restaurant_cost_ < kRestaurantCostRange.min ||
+        ctorTester->restaurant_cost_ > kRestaurantCostRange.max) {
+      throw std::runtime_error ("restaurant_cost_ is not within it's range");
+    }
+  }
+
+  // restaurant_penalty_
+  distributor.reset(make_distributor_from_range(kRestaurantPenaltyRange));
+  for (unsigned i = 0; i < testIterations; ++i) {
+    ctorTester.reset(make_autocost_from_json("restaurant_penalty", (*distributor)(generator)));
+    if (ctorTester->restaurant_penalty_ < kRestaurantPenaltyRange.min ||
+        ctorTester->restaurant_penalty_ > kRestaurantPenaltyRange.max) {
+      throw std::runtime_error ("restaurant_penalty_ is not within it's range");
+    }
+  }
+
+  // school_cost_
+  distributor.reset(make_distributor_from_range(kSchoolCostRange));
+  for (unsigned i = 0; i < testIterations; ++i) {
+    ctorTester.reset(make_autocost_from_json("school_cost", (*distributor)(generator)));
+    if (ctorTester->school_cost_ < kSchoolCostRange.min ||
+        ctorTester->school_cost_ > kSchoolCostRange.max) {
+      throw std::runtime_error ("school_cost_ is not within it's range");
+    }
+  }
+
+  // school_penalty_
+  distributor.reset(make_distributor_from_range(kSchoolPenaltyRange));
+  for (unsigned i = 0; i < testIterations; ++i) {
+    ctorTester.reset(make_autocost_from_json("school_penalty", (*distributor)(generator)));
+    if (ctorTester->school_penalty_ < kSchoolPenaltyRange.min ||
+        ctorTester->school_penalty_ > kSchoolPenaltyRange.max) {
+      throw std::runtime_error ("school_penalty_ is not within it's range");
     }
   }
 
