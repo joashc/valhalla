@@ -73,6 +73,19 @@ struct graph_callback : public OSMPBF::Callback {
   virtual void node_callback(uint64_t osmid, double lng, double lat, const OSMPBF::Tags &tags) override {
     // Check if it is in the list of nodes used by ways
     if (!shape_.get(osmid)) {
+      Tags results = lua_.NonWayNodeTransform(tags);
+      for (const auto& tag : results) {
+        if (tag.first == "school") {
+          if (tag.second == "true") {
+            std::cout << "Found school";
+          }
+        }
+        else if (tag.first == "restaurant") {
+          if (tag.second == "true") {
+            std::cout << "Found restaurant";
+          }
+        }
+      }
       return;
     }
 
@@ -150,24 +163,6 @@ struct graph_callback : public OSMPBF::Callback {
             ++osmdata_.edge_count;
           }
           n.set_type(NodeType::kTollBooth);
-        }
-      }
-      else if (tag.first == "school") {
-        if (tag.second == "true") {
-          if (!intersection_.get(osmid)) {
-            intersection_.set(osmid);
-            ++osmdata_.edge_count;
-          }
-          n.set_type(NodeType::kSchool);
-        }
-      }
-      else if (tag.first == "restaurant") {
-        if (tag.second == "true") {
-          if (!intersection_.get(osmid)) {
-            intersection_.set(osmid);
-            ++osmdata_.edge_count;
-          }
-          n.set_type(NodeType::kRestaurant);
         }
       }
       else if (tag.first == "border_control") {

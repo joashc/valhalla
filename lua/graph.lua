@@ -1427,6 +1427,16 @@ function filter_tags_generic(kv)
   return 0
 end
 
+function non_way_nodes_proc(kv, nokeys)
+  if kv["amenity"] == "school" then
+    kv["school"] = "true"
+  end
+
+  if kv["amenity"] == "restaurant" then
+    kv["restaurant"] = "true"
+  end
+end
+
 function nodes_proc (kv, nokeys)
   --normalize a few tags that we care about
   local access = access[kv["access"]] or "true"
@@ -1573,14 +1583,6 @@ function nodes_proc (kv, nokeys)
     kv["border_control"] = "true"
   elseif kv["barrier"] == "toll_booth" then
     kv["toll_booth"] = "true"
-  end
-
-  if kv["amenity"] == "school" then
-    kv["school"] = "true"
-  end
-
-  if kv["amenity"] == "restaurant" then
-    kv["restaurant"] = "true"
   end
 
   local coins = toll[kv["payment:coins"]] or "false"
