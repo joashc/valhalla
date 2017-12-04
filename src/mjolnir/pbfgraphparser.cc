@@ -152,6 +152,24 @@ struct graph_callback : public OSMPBF::Callback {
           n.set_type(NodeType::kTollBooth);
         }
       }
+      else if (tag.first == "school") {
+        if (tag.second == "true") {
+          if (!intersection_.get(osmid)) {
+            intersection_.set(osmid);
+            ++osmdata_.edge_count;
+          }
+          n.set_type(NodeType::kSchool);
+        }
+      }
+      else if (tag.first == "restaurant") {
+        if (tag.second == "true") {
+          if (!intersection_.get(osmid)) {
+            intersection_.set(osmid);
+            ++osmdata_.edge_count;
+          }
+          n.set_type(NodeType::kRestaurant);
+        }
+      }
       else if (tag.first == "border_control") {
         if (tag.second == "true") {
           if (!intersection_.get(osmid)) {

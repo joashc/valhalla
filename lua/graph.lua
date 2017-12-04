@@ -1575,6 +1575,14 @@ function nodes_proc (kv, nokeys)
     kv["toll_booth"] = "true"
   end
 
+  if kv["amenity"] == "school" then
+    kv["school"] = "true"
+  end
+
+  if kv["amenity"] == "restaurant" then
+    kv["restaurant"] = "true"
+  end
+
   local coins = toll[kv["payment:coins"]] or "false"
   local notes = toll[kv["payment:notes"]] or "false"
 
