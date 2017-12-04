@@ -173,19 +173,13 @@ Tags LuaTagTransform::NonWayNodeTransform(const Tags &maptags) {
     lua_pushinteger(state_, count);
 
     //call lua
-    if (lua_pcall(state_, 2, type == OSMType::kWay ? 4 : 2, 0)) {
+    if (lua_pcall(state_, 2, 2, 0)) {
       LOG_ERROR("Failed to execute lua function for basic tag processing.");
     }
 
     //TODO:  if we dont care about it we stop looking.  Look for filter = 1
     /*if(lua_tonumber(state, 1))
       return result;*/
-
-    //osm2pgsql has extra info for roads and polygons which we dont care about
-    if(type == OSMType::kWay) {
-      lua_pop(state_,1);
-      lua_pop(state_,1);
-    }
 
     //pull out the keys and values into a map
     lua_pushnil(state_);
