@@ -31,6 +31,7 @@ class LuaTagTransform {
   ~LuaTagTransform();
 
   Tags Transform(OSMType type, const Tags &tags);
+  Tags NonWayNodeTransform(const Tags &maptags);
 
  protected:
 
