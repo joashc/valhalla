@@ -480,8 +480,8 @@ Cost AutoCost::TransitionCost(const baldr::DirectedEdge* edge,
     penalty += tollbooth_penalty_;
   }
   if (node->type() == NodeType::kRestaurant) {
-    seconds += restaurant_cost_;
-    penalty += restaurant_penalty_;
+    seconds += 900;//restaurant_cost_;
+    penalty += 900;//restaurant_penalty_;
   }
   if (node->type() == NodeType::kSchool) {
     seconds += school_cost_;
