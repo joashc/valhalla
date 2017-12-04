@@ -322,23 +322,20 @@ AutoCost::AutoCost(const boost::property_tree::ptree& pt)
   tollbooth_cost_ = kTollBoothCostRange(
     pt.get<float>("toll_booth_cost", kDefaultTollBoothCost)
   );
+  tollbooth_penalty_ = kTollBoothPenaltyRange(
+    pt.get<float>("toll_booth_penalty", kDefaultTollBoothPenalty)
+  );
   restaurant_cost_ = kRestaurantCostRange(
     pt.get<float>("restaurant_cost", kDefaultRestaurantCost)
   );
-  restaurant_cost_ = kRestaurantPenaltyRange(
+  restaurant_penalty = kRestaurantPenaltyRange(
     pt.get<float>("restaurant_penalty", kDefaultRestaurantPenalty)
   );
   school_cost_ = kSchoolCostRange(
     pt.get<float>("school_cost", kDefaultSchoolCost)
   );
-  school_cost_ = kSchoolPenaltyRange(
+  school_penalty = kSchoolPenaltyRange(
     pt.get<float>("school_penalty", kDefaultSchoolPenalty)
-  );
-  tollbooth_penalty_ = kTollBoothPenaltyRange(
-    pt.get<float>("toll_booth_penalty", kDefaultTollBoothPenalty)
-  );
-  restaurant_penalty_ = kTollBoothPenaltyRange(
-    pt.get<float>("toll_booth_penalty", kDefaultTollBoothPenalty)
   );
   alley_penalty_ = kAlleyPenaltyRange(
     pt.get<float>("alley_penalty", kDefaultAlleyPenalty)
